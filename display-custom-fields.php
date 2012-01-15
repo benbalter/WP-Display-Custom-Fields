@@ -19,8 +19,9 @@ class Display_Custom_Fields {
 		add_filter( 'the_content', array( &$this, 'content_filter' ) );
 		add_action( 'wp_enqueue_scripts', array( &$this, 'enqueue_css' ) );
 		add_filter( 'dcf_postmeta_key', array( &$this, 'format_postmeta_key' ) );
-		add_filter( 'display_custom_fields', array( &$this, 'post_type_filter' ) );
-		
+		add_filter( 'display_custom_fields', array( &$this, 'post_type_filter' ), 10, 2 );
+		add_filter( 'dcf_postmeta_key', array( &$this, 'hidden_postmeta_filter'), 5 );
+		add_filter( 'dcf_postmeta_value', array( &$this, 'implode_array_filter' ) );
 	}
 	
 	/**
@@ -69,12 +70,12 @@ class Display_Custom_Fields {
 		
 			//make it easy to format individual values
 			$key = apply_filters( 'dcf_postmeta_key', $key, $post );
-			$value = apply_filters( 'dcf_postmeta_value', $value, $key, $post );
+			$value = apply_filters( 'dcf_postmeta_value', $value[0], $key, $post );
 			
-			if ( empty( $value ) )
+			if ( empty( $value ) || empty( $key ) || !$key || !$value )
 				continue;
-				
-			$output[ $key ] = $value[0];
+								
+			$output[ $key ] = $value;
 		}
 	
 		return $output;
@@ -176,6 +177,29 @@ class Display_Custom_Fields {
 			
 		return true;
 	}
+	
+	/**
+	 * if postmeta starts with an underscore, don't display it on the front end
+	 */
+	function hidden_postmeta_filter( $key ) {
+
+		if ( substr( $key, 0, 1 ) == '_' )
+			return false;
+		
+		return $key;
+	}
+	
+	/**
+	 *  If metavalue is an array, convert to string
+	 */
+	function implode_array_filter( $value ) {
+	
+		if ( !is_array( $value ) )
+			return $value;
+						
+		return implode (', ', $value );
+	
+	}
 }
 
-new Display_Custom_Fields();
+$dcf = new Display_Custom_Fields();
