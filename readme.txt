@@ -54,7 +54,7 @@ Display metabox below content (rather than floated to the right)
 == Changelog ==
 
 = 0.1 =
-* Initial Release
+* Initial Alpha Release
 
 
 
