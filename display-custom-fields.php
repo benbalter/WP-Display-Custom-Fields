@@ -93,7 +93,7 @@ class Display_Custom_Fields {
  		global $post;
  		
  		//overrided, e.g., by post type
- 		if ( !apply_filters( 'display_custom_fields'), true, $post )
+ 		if ( !apply_filters( 'display_custom_fields', true, $post ) )
  			return $content;
  		
  		$data = array_merge( $this->get_taxonomies(), $this->get_postmeta() );
